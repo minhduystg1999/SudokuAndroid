@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 
 class BoardView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
@@ -51,12 +52,12 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
 
     override fun onDraw(canvas: Canvas) {
         cellSizePixels = (width / size).toFloat()
-        fillCell(canvas)
+        fillCells(canvas)
         drawLine(canvas)
     }
 
-    //Ve mau cho cell duoc select
-    private fun fillCell(canvas: Canvas) {
+    //Fill cac cell duoc select hoac conflict
+    private fun fillCells(canvas: Canvas) {
         if (selectRow == -1 || selectColumn == -1) return  //Neu chua chon cell thi khong can fill
         for (row in 0..size)
             for (col in 0..size) {
@@ -64,7 +65,14 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
                     fillCell(canvas, row, col, selectCell)
                 else if (row == selectRow || col == selectColumn)
                     fillCell(canvas, row, col, conflictCell)
+                else if (row / sqrtSize == selectRow / sqrtSize && col / sqrtSize == selectColumn / sqrtSize)
+                    fillCell(canvas, row, col, conflictCell)
             }
+    }
+
+    //Fill cell
+    private fun fillCell(canvas: Canvas, row: Int, col: Int, paint: Paint) {
+        canvas.drawRect(col*cellSizePixels, row*cellSizePixels, (col + 1)*cellSizePixels, (row + 1)*cellSizePixels, paint )
     }
 
     //Ve line chia cach cac o va line vien ngoai
@@ -81,5 +89,21 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
             canvas.drawLine(i * cellSizePixels, 0F, i * cellSizePixels, height.toFloat(), lineUsing)
             canvas.drawLine(0F, i * cellSizePixels, width.toFloat() , i* cellSizePixels, lineUsing)
         }
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        return when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                handleTouchEvent(event.x, event.y)
+                true
+            }
+            else -> false
+        }
+    }
+
+    private fun handleTouchEvent(x: Float, y: Float) {
+        selectColumn = (x / cellSizePixels).toInt()
+        selectRow = (y / cellSizePixels).toInt()
+        invalidate()
     }
 }
