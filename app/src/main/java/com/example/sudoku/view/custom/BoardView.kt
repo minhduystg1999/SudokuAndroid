@@ -1,4 +1,4 @@
-package com.example.sudoku
+package com.example.sudoku.view.custom
 
 import android.content.Context
 import android.graphics.Canvas
@@ -17,6 +17,8 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     //For selected cell
     private var selectRow = -1              //selected row
     private var selectColumn = -1           //selected column
+
+    private var listener: BoardView.OnTouchListener? = null
 
     //Thick line for drawing lines
     private val thickLine = Paint().apply{
@@ -102,8 +104,22 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     }
 
     private fun handleTouchEvent(x: Float, y: Float) {
-        selectColumn = (x / cellSizePixels).toInt()
-        selectRow = (y / cellSizePixels).toInt()
+        val posSelectColumn = (x / cellSizePixels).toInt()
+        val posSelectRow = (y / cellSizePixels).toInt()
+        listener?.onCellTouched(posSelectRow, posSelectColumn)
+    }
+
+    fun updateSelectCellUI(row: Int, col: Int) {
+        selectRow = row
+        selectColumn = col
         invalidate()
+    }
+
+    fun registerListener(listener: BoardView.OnTouchListener) {
+        this.listener = listener
+    }
+
+    interface OnTouchListener{
+        fun onCellTouched(row: Int, col: Int)
     }
 }
