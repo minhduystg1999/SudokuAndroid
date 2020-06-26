@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import com.example.sudoku.game.Cell
 
 class BoardView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
 
@@ -18,7 +20,9 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     private var selectRow = -1              //selected row
     private var selectColumn = -1           //selected column
 
-    private var listener: BoardView.OnTouchListener? = null
+    private var cells: List<Cell>? = null   //List cell
+
+    private var listener: BoardView.OnTouchListener? = null     //listener of touch event
 
     //Thick line for drawing lines
     private val thickLine = Paint().apply{
@@ -46,6 +50,13 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         color = Color.parseColor("#efedef")
     }
 
+    //Value text paint
+    private val textPaint = Paint().apply {
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.BLACK
+        textSize = 56F
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val sizePixels = Math.min(widthMeasureSpec, heightMeasureSpec)
@@ -56,20 +67,22 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         cellSizePixels = (width / size).toFloat()
         fillCells(canvas)
         drawLine(canvas)
+        writeValue(canvas)
     }
 
     //Fill cac cell duoc select hoac conflict
     private fun fillCells(canvas: Canvas) {
-        if (selectRow == -1 || selectColumn == -1) return  //Neu chua chon cell thi khong can fill
-        for (row in 0..size)
-            for (col in 0..size) {
-                if (row == selectRow && col == selectColumn)
-                    fillCell(canvas, row, col, selectCell)
-                else if (row == selectRow || col == selectColumn)
-                    fillCell(canvas, row, col, conflictCell)
-                else if (row / sqrtSize == selectRow / sqrtSize && col / sqrtSize == selectColumn / sqrtSize)
-                    fillCell(canvas, row, col, conflictCell)
-            }
+        cells?.forEach {
+            val row = it.row
+            val col = it.col
+
+            if (row == selectRow && col == selectColumn)
+                fillCell(canvas, row, col, selectCell)
+            else if (row == selectRow || col == selectColumn)
+                fillCell(canvas, row, col, conflictCell)
+            else if (row / sqrtSize == selectRow / sqrtSize && col / sqrtSize == selectColumn / sqrtSize)
+                fillCell(canvas, row, col, conflictCell)
+        }
     }
 
     //Fill cell
@@ -93,6 +106,23 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         }
     }
 
+    //Ghi value vao cell
+    private fun writeValue(canvas: Canvas) {
+        cells?.forEach {
+            //Chuyen value sang string vu tao bounds cho text cell
+            val row = it.row
+            val col = it.col
+            val valueString = it.value.toString()
+
+            val textBounds = Rect()
+            textPaint.getTextBounds(valueString, 0, valueString.length, textBounds)
+            val textWidth = textPaint.measureText(valueString)
+            val textHeight = textBounds.height()
+
+            canvas.drawText(valueString, (col * cellSizePixels) + cellSizePixels / 2 - textWidth / 2, (row * cellSizePixels) + cellSizePixels / 2 - textHeight / 2, textPaint)
+        }
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -101,6 +131,11 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
             }
             else -> false
         }
+    }
+
+    fun updateCells(cells: List<Cell>) {
+        this.cells = cells
+        invalidate()
     }
 
     private fun handleTouchEvent(x: Float, y: Float) {
