@@ -1,7 +1,10 @@
 package com.example.sudoku.view
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.sudoku.R
@@ -14,6 +17,8 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
 
     private lateinit var viewModel: SudokuViewModel     //View model
 
+    private lateinit var numberButtons: List<Button>    //Number buttons
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -22,11 +27,15 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
 
         viewModel = ViewModelProviders.of(this).get(SudokuViewModel::class.java)
         viewModel.sudokuGame.selectCellLiveData.observe(this, Observer { updateSelectCellUI(it) })
-        viewModel.sudokuGame.cellsLivcData.observe(this, Observer { updateCells(it) })
+        viewModel.sudokuGame.cellsLiveData.observe(this, Observer { updateCells(it) })
+        viewModel.sudokuGame.isNotesLiveData.observe(this, Observer { updateNotesUI(it) })
+        viewModel.sudokuGame.highlightKeysLiveData.observe(this, Observer { updateHighlightKeys(it) })
 
-        val buttons = listOf(firstbutton, secondbutton, thirdbutton, fourthbutton, fifthbutton, sixthbutton, seventhbutton, eighthbutton, ninthbutton)
+        numberButtons = listOf(firstbutton, secondbutton, thirdbutton, fourthbutton, fifthbutton, sixthbutton, seventhbutton, eighthbutton, ninthbutton)
 
-        buttons.forEachIndexed { index, button -> button.setOnClickListener { viewModel.sudokuGame.handleInput(index + 1 ) } }
+        numberButtons.forEachIndexed { index, button -> button.setOnClickListener { viewModel.sudokuGame.handleInput(index + 1 ) } }
+
+        notesButton.setOnClickListener { viewModel.sudokuGame.notesStatusChange() }
     }
 
     private fun updateSelectCellUI(cell: Pair<Int, Int>?) = cell?.let{
@@ -35,6 +44,21 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
 
     private fun updateCells(cells: List<Cell>?) = cells?.let {
         boardview.updateCells(cells)
+    }
+
+    private fun updateNotesUI(isNotes: Boolean?) = isNotes?.let {
+        if (it)
+            notesButton.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        else
+            notesButton.setBackgroundColor(Color.LTGRAY)
+    }
+
+    private fun updateHighlightKeys(set: Set<Int>?) = set?.let {
+        numberButtons.forEachIndexed { index, button ->
+            val color = if (set.contains(index + 1)) ContextCompat.getColor(this, R.color.colorPrimary)
+                        else Color.LTGRAY
+            button.setBackgroundColor(color)
+        }
     }
 
     override fun onCellTouched(row: Int, col: Int) {

@@ -4,47 +4,74 @@ import androidx.lifecycle.MutableLiveData
 
 class SudokuGame {
 
-    //Dung de nhan select cell data live tu game
-    var selectCellLiveData = MutableLiveData<Pair<Int, Int>>()
-    var cellsLivcData = MutableLiveData<List<Cell>>()
-
-    //Dung de nhan live data trong trang thai notes
-    val isNotesLiveData = MutableLiveData<Boolean>()
-    val highlightKeysLiveData = MutableLiveData<Set<Int>>()
-
     private var selectRow = -1
     private var selectColumn = -1
 
     private val board: Board
+
+    //Dung de nhan select cell data live tu game
+    var selectCellLiveData = MutableLiveData<Pair<Int, Int>>()
+    var cellsLiveData = MutableLiveData<List<Cell>>()
+
+    //Dung de nhan live data trong trang thai notes
+    var isNotesLiveData = MutableLiveData<Boolean>()
+    var highlightKeysLiveData = MutableLiveData<Set<Int>>()
+    private var isNotes = false
 
     //Khoi tao cell va live data
     init{
         val cells = List(9 * 9) {
             i -> Cell(i / 9, i % 9, i % 9)
         }
-
+        cells[0].notes = mutableSetOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
         board = Board(9, cells)
 
         selectCellLiveData.postValue(Pair(selectRow, selectColumn))
-        cellsLivcData.postValue(board.cells)
+        cellsLiveData.postValue(board.cells)
+        isNotesLiveData.postValue(isNotes)
     }
 
     //Dua vao value cho cells
     fun handleInput(number: Int) {
         //Return if 'there's no selected cell' or 'selected cell is a starting cell'
         if (selectRow == -1 || selectColumn == -1) return
-        if (!board.getCell(selectRow, selectColumn).isStartingCell) return
+        val cell = board.getCell(selectRow, selectColumn)
+        if (!cell.isStartingCell) return
 
-        board.getCell(selectRow, selectColumn).value = number
-        cellsLivcData.postValue(board.cells)
+        if (isNotes) {
+            if (cell.notes.contains(number))
+                cell.notes.remove(number)
+            else
+                cell.notes.add(number)
+            highlightKeysLiveData.postValue(cell.notes)
+        } else {
+            cell.value = number
+            cellsLiveData.postValue(board.cells)
+        }
     }
 
     //Update select cell
     fun updateSelectCell(row: Int, col: Int){
-        if (!board.getCell(row, col).isStartingCell) {
+        val cell = board.getCell(selectRow, selectColumn)
+        if (!cell.isStartingCell) {
             selectRow = row
             selectColumn = col
             selectCellLiveData.postValue(Pair(row, col))
+
+            if (isNotes)
+                highlightKeysLiveData.postValue(cell.notes)
         }
+    }
+
+    //Function change notes status
+    fun notesStatusChange() {
+        isNotes = !isNotes
+        isNotesLiveData.postValue(isNotes)
+
+        val currentNotes = if (isNotes)
+                                board.getCell(selectRow, selectColumn).notes
+                           else
+                                setOf<Int>()
+        highlightKeysLiveData.postValue(currentNotes)
     }
 }

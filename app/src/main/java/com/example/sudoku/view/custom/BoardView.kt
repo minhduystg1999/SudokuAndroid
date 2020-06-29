@@ -11,7 +11,10 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
 
     private var sqrtSize = 3                // = number of row or column
     private var size = 9                    // = number of all cells = sqrtSize^2
+
+    //Size pixels (0F vi den function onDraw va on Measure se duoc gan gia tri da duoc measured)
     private var cellSizePixels = 0F         // a cell's size pixels
+    private var notesSizePixels = 0F        // notes' size pixels
 
     //For selected cell
     private var selectRow = -1              //selected row
@@ -67,6 +70,12 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         typeface = Typeface.DEFAULT_BOLD
     }
 
+    //Notes text paint
+    private val notesTextPaint = Paint().apply {
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.BLACK
+    }
+
 
     //Override function onMeasure de nhan gia tri kich thuoc cell
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -75,9 +84,18 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         setMeasuredDimension(sizePixels, sizePixels)
     }
 
+    //Update cac gia tri measure trong onMeasure
+    private fun updateMeasurement(width: Int) {
+        cellSizePixels = (width / size).toFloat()
+        notesSizePixels = cellSizePixels / sqrtSize.toFloat()
+        notesTextPaint.textSize = notesSizePixels
+        textPaint.textSize = cellSizePixels / 1.5F
+        startingCellTextPaint.textSize = cellSizePixels / 1.5F
+    }
+
     //Override function onDraw de thuc hien fill cell, draw line, write value
     override fun onDraw(canvas: Canvas) {
-        cellSizePixels = (width / size).toFloat()
+        updateMeasurement(width)
         fillCells(canvas)
         drawLine(canvas)
         writeValue(canvas)
@@ -125,19 +143,42 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
 
     //Ghi value vao cell
     private fun writeValue(canvas: Canvas) {
-        cells?.forEach {
+        cells?.forEach { cell ->
             //Chuyen value sang string va tao bounds cho text cell
-            val row = it.row
-            val col = it.col
-            val valueString = it.value.toString()
-
-            val writeValuePaint = if (it.isStartingCell) startingCellTextPaint else textPaint
+            val value = cell.value
             val textBounds = Rect()
-            writeValuePaint.getTextBounds(valueString, 0, valueString.length, textBounds)
-            val textWidth = writeValuePaint.measureText(valueString)
-            val textHeight = textBounds.height()
 
-            canvas.drawText(valueString, (col * cellSizePixels) + cellSizePixels / 2 - textWidth / 2, (row * cellSizePixels) + cellSizePixels / 2 - textHeight / 2, writeValuePaint)
+            if (value == 0) {
+                //Write notes
+                cell.notes.forEach {note ->
+                    val rowInCell = (note - 1) / sqrtSize
+                    val colInCell = (note - 1) % sqrtSize
+                    val valueString = note.toString()
+                    notesTextPaint.getTextBounds(valueString, 0, valueString.length, textBounds)
+                    val textWidth = notesTextPaint.measureText(valueString)
+                    val textHeight = textBounds.height()
+
+                    canvas.drawText(
+                        valueString,
+                        (cell.col * cellSizePixels) + (colInCell * notesSizePixels) + notesSizePixels / 2 - textWidth / 2,
+                        (cell.row * cellSizePixels) + (rowInCell * notesSizePixels) + notesSizePixels / 2 - textHeight / 2,
+                        notesTextPaint
+                    )
+                }
+            } else {
+                val valueString = cell.value.toString()
+                val writeValuePaint = if (cell.isStartingCell) startingCellTextPaint else textPaint
+                writeValuePaint.getTextBounds(valueString, 0, valueString.length, textBounds)
+                val textWidth = writeValuePaint.measureText(valueString)
+                val textHeight = textBounds.height()
+
+                canvas.drawText(
+                    valueString,
+                    (cell.col * cellSizePixels) + cellSizePixels / 2 - textWidth / 2,
+                    (cell.row * cellSizePixels) + cellSizePixels / 2 - textHeight / 2,
+                    writeValuePaint
+                )
+            }
         }
     }
 
