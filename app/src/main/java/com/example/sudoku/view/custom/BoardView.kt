@@ -1,10 +1,7 @@
 package com.example.sudoku.view.custom
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -54,15 +51,31 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     private val textPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.BLACK
-        textSize = 56F
+        textSize = 50F
     }
 
+    private val startingCellPaint = Paint().apply {
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.parseColor("#acacac")
+    }
+
+    //Value text paint for the starting cells
+    private val startingCellTextPaint = Paint().apply {
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.BLACK
+        textSize = 50F
+        typeface = Typeface.DEFAULT_BOLD
+    }
+
+
+    //Override function onMeasure de nhan gia tri kich thuoc cell
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val sizePixels = Math.min(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(sizePixels, sizePixels)
     }
 
+    //Override function onDraw de thuc hien fill cell, draw line, write value
     override fun onDraw(canvas: Canvas) {
         cellSizePixels = (width / size).toFloat()
         fillCells(canvas)
@@ -70,13 +83,15 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         writeValue(canvas)
     }
 
-    //Fill cac cell duoc select hoac conflict
+    //Fill tat ca cac cells
     private fun fillCells(canvas: Canvas) {
         cells?.forEach {
             val row = it.row
             val col = it.col
 
-            if (row == selectRow && col == selectColumn)
+            if (it.isStartingCell)
+                fillCell(canvas, row, col, startingCellPaint)
+            else if (row == selectRow && col == selectColumn)
                 fillCell(canvas, row, col, selectCell)
             else if (row == selectRow || col == selectColumn)
                 fillCell(canvas, row, col, conflictCell)
@@ -85,15 +100,17 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         }
     }
 
-    //Fill cell
+    //Fill 1 cell
     private fun fillCell(canvas: Canvas, row: Int, col: Int, paint: Paint) {
         canvas.drawRect(col*cellSizePixels, row*cellSizePixels, (col + 1)*cellSizePixels, (row + 1)*cellSizePixels, paint )
     }
 
     //Ve line chia cach cac o va line vien ngoai
     private fun drawLine(canvas: Canvas) {
+        //Ve vien ngoai cua toan bo canvas
         canvas.drawRect(0F, 0F, width.toFloat(), height.toFloat(), thickLine)
 
+        //Ve cac line ngang doc cho tung don vi
         for( i in 1 until size )
         {
             val lineUsing = when (i % sqrtSize) {
@@ -109,17 +126,18 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     //Ghi value vao cell
     private fun writeValue(canvas: Canvas) {
         cells?.forEach {
-            //Chuyen value sang string vu tao bounds cho text cell
+            //Chuyen value sang string va tao bounds cho text cell
             val row = it.row
             val col = it.col
             val valueString = it.value.toString()
 
+            val writeValuePaint = if (it.isStartingCell) startingCellTextPaint else textPaint
             val textBounds = Rect()
-            textPaint.getTextBounds(valueString, 0, valueString.length, textBounds)
-            val textWidth = textPaint.measureText(valueString)
+            writeValuePaint.getTextBounds(valueString, 0, valueString.length, textBounds)
+            val textWidth = writeValuePaint.measureText(valueString)
             val textHeight = textBounds.height()
 
-            canvas.drawText(valueString, (col * cellSizePixels) + cellSizePixels / 2 - textWidth / 2, (row * cellSizePixels) + cellSizePixels / 2 - textHeight / 2, textPaint)
+            canvas.drawText(valueString, (col * cellSizePixels) + cellSizePixels / 2 - textWidth / 2, (row * cellSizePixels) + cellSizePixels / 2 - textHeight / 2, writeValuePaint)
         }
     }
 
