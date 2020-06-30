@@ -54,7 +54,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     private val textPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.BLACK
-        textSize = 50F
+        textSize = 24F
     }
 
     private val startingCellPaint = Paint().apply {
@@ -66,7 +66,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     private val startingCellTextPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.BLACK
-        textSize = 50F
+        textSize = 24F
         typeface = Typeface.DEFAULT_BOLD
     }
 
@@ -88,7 +88,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     private fun updateMeasurement(width: Int) {
         cellSizePixels = (width / size).toFloat()
         notesSizePixels = cellSizePixels / sqrtSize.toFloat()
-        notesTextPaint.textSize = notesSizePixels
+        notesTextPaint.textSize = cellSizePixels / sqrtSize.toFloat()
         textPaint.textSize = cellSizePixels / 1.5F
         startingCellTextPaint.textSize = cellSizePixels / 1.5F
     }
@@ -160,8 +160,8 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
 
                     canvas.drawText(
                         valueString,
-                        (cell.col * cellSizePixels) + (colInCell * notesSizePixels) + notesSizePixels / 2 - textWidth / 2,
-                        (cell.row * cellSizePixels) + (rowInCell * notesSizePixels) + notesSizePixels / 2 - textHeight / 2,
+                        (cell.col * cellSizePixels) + (colInCell * notesSizePixels) + notesSizePixels / 2 - textWidth / 2f,
+                        (cell.row * cellSizePixels) + (rowInCell * notesSizePixels) + notesSizePixels / 2 + textHeight / 2f,
                         notesTextPaint
                     )
                 }
@@ -175,7 +175,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
                 canvas.drawText(
                     valueString,
                     (cell.col * cellSizePixels) + cellSizePixels / 2 - textWidth / 2,
-                    (cell.row * cellSizePixels) + cellSizePixels / 2 - textHeight / 2,
+                    (cell.row * cellSizePixels) + cellSizePixels / 2 + textHeight / 2,
                     writeValuePaint
                 )
             }

@@ -1,6 +1,7 @@
 package com.example.sudoku.view
 
 import android.graphics.Color
+import android.graphics.PorterDuff
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -13,6 +14,7 @@ import com.example.sudoku.view.custom.BoardView
 import com.example.sudoku.viewmodel.SudokuViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
 
     private lateinit var viewModel: SudokuViewModel     //View model
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
         numberButtons.forEachIndexed { index, button -> button.setOnClickListener { viewModel.sudokuGame.handleInput(index + 1 ) } }
 
         notesButton.setOnClickListener { viewModel.sudokuGame.notesStatusChange() }
+
+        deleteButton.setOnClickListener { viewModel.sudokuGame.delete() }
     }
 
     private fun updateSelectCellUI(cell: Pair<Int, Int>?) = cell?.let{
@@ -47,17 +51,16 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
     }
 
     private fun updateNotesUI(isNotes: Boolean?) = isNotes?.let {
-        if (it)
-            notesButton.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
-        else
-            notesButton.setBackgroundColor(Color.LTGRAY)
+        val color = if (it) ContextCompat.getColor(this, R.color.colorPrimary)
+                    else Color.LTGRAY
+        notesButton.background.setColorFilter(color, PorterDuff.Mode.MULTIPLY)
     }
 
     private fun updateHighlightKeys(set: Set<Int>?) = set?.let {
         numberButtons.forEachIndexed { index, button ->
             val color = if (set.contains(index + 1)) ContextCompat.getColor(this, R.color.colorPrimary)
                         else Color.LTGRAY
-            button.setBackgroundColor(color)
+            button.background.setColorFilter(color, PorterDuff.Mode.MULTIPLY)
         }
     }
 
