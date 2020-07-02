@@ -1,10 +1,14 @@
 package com.example.sudoku.view
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.graphics.Color
 import android.graphics.PorterDuff
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
+import androidx.core.app.DialogCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -13,6 +17,7 @@ import com.example.sudoku.game.Cell
 import com.example.sudoku.view.custom.BoardView
 import com.example.sudoku.viewmodel.SudokuViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlin.system.exitProcess
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
@@ -24,6 +29,8 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        //showCongratsDialog(boardview)
 
         boardview.registerListener(this)
 
@@ -38,6 +45,8 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
         numberButtons.forEachIndexed { index, button -> button.setOnClickListener { viewModel.sudokuGame.handleInput(index + 1 ) } }
 
         notesButton.setOnClickListener { viewModel.sudokuGame.notesStatusChange() }
+
+        resetButton.setOnClickListener { viewModel.sudokuGame.reset() }
 
         deleteButton.setOnClickListener { viewModel.sudokuGame.delete() }
     }
@@ -66,5 +75,26 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
 
     override fun onCellTouched(row: Int, col: Int) {
         viewModel.sudokuGame.updateSelectCell(row, col)
+    }
+
+    fun showCongratsDialog(viewModel: BoardView?) {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setTitle("Congratulations!")
+        dialog.setMessage("You have finished the sudoku. Cheers for the hard work!")
+        dialog.setPositiveButton("OK") {
+            dialog, which ->
+            run {
+                finish()
+                startActivity(intent)
+            }
+        }
+        dialog.setNegativeButton("Exit") {
+            dialog, which ->
+            run {
+                finish()
+                exitProcess(0)
+            }
+        }
+        dialog.show()
     }
 }

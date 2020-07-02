@@ -57,6 +57,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         textSize = 24F
     }
 
+    //Cell paint for starting cells
     private val startingCellPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.parseColor("#acacac")
@@ -66,6 +67,14 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     private val startingCellTextPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.BLACK
+        textSize = 24F
+        typeface = Typeface.DEFAULT_BOLD
+    }
+
+    //Value text paint for the wrong input value
+    private val wrongCellTextPaint = Paint().apply {
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.RED
         textSize = 24F
         typeface = Typeface.DEFAULT_BOLD
     }
@@ -91,6 +100,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         notesTextPaint.textSize = cellSizePixels / sqrtSize.toFloat()
         textPaint.textSize = cellSizePixels / 1.5F
         startingCellTextPaint.textSize = cellSizePixels / 1.5F
+        wrongCellTextPaint.textSize = cellSizePixels / 1.5F
     }
 
     //Override function onDraw de thuc hien fill cell, draw line, write value
@@ -167,7 +177,9 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
                 }
             } else {
                 val valueString = cell.value.toString()
-                val writeValuePaint = if (cell.isStartingCell) startingCellTextPaint else textPaint
+                val writeValuePaint = if (cell.isStartingCell) startingCellTextPaint
+                                      else if (!cell.isRightValue) wrongCellTextPaint
+                                           else textPaint
                 writeValuePaint.getTextBounds(valueString, 0, valueString.length, textBounds)
                 val textWidth = writeValuePaint.measureText(valueString)
                 val textHeight = textBounds.height()
