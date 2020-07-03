@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
         viewModel = ViewModelProviders.of(this).get(SudokuViewModel::class.java)
         viewModel.sudokuGame.selectCellLiveData.observe(this, Observer { updateSelectCellUI(it) })
         viewModel.sudokuGame.cellsLiveData.observe(this, Observer { updateCells(it) })
-        viewModel.sudokuGame.isNotesLiveData.observe(this, Observer { updateNotesUI(it) })
         viewModel.sudokuGame.highlightKeysLiveData.observe(this, Observer { updateHighlightKeys(it) })
         viewModel.sudokuGame.isFinishedLiveData.observe(this, Observer { updateFinishGame(it) })
 
@@ -44,7 +43,7 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
 
         newButton.setOnClickListener { viewModel.sudokuGame.newGame() }
 
-        notesButton.setOnClickListener { viewModel.sudokuGame.notesStatusChange() }
+        hintButton.setOnClickListener { viewModel.sudokuGame.hint() }
 
         resetButton.setOnClickListener { viewModel.sudokuGame.reset() }
 
@@ -61,14 +60,7 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
         boardView.updateCells(cells)
     }
 
-    //Function update trang thai note
-    private fun updateNotesUI(isNotes: Boolean?) = isNotes?.let {
-        val color = if (it) ContextCompat.getColor(this, R.color.colorPrimary)
-                    else Color.LTGRAY
-        //notesButton.background.setColorFilter(color, PorterDuff.Mode.MULTIPLY)
-    }
-
-    //Function update cac number buttons duoc highlight khi trong trang thai note
+    //Function update cac number buttons duoc highlight
     private fun updateHighlightKeys(set: Set<Int>?) = set?.let {
         numberButtons.forEachIndexed { index, button ->
             val color = if (set.contains(index + 1)) ContextCompat.getColor(this, R.color.colorPrimary)
