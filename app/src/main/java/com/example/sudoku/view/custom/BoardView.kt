@@ -209,16 +209,16 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         invalidate()
     }
 
-    private fun handleTouchEvent(x: Float, y: Float) {
-        val posSelectColumn = (x / cellSizePixels).toInt()
-        val posSelectRow = (y / cellSizePixels).toInt()
-        listener?.onCellTouched(posSelectRow, posSelectColumn)
-    }
-
     fun updateSelectCellUI(row: Int, col: Int) {
         selectRow = row
         selectColumn = col
         invalidate()
+    }
+
+    private fun handleTouchEvent(x: Float, y: Float) {
+        val posSelectColumn = (x / cellSizePixels).toInt()
+        val posSelectRow = (y / cellSizePixels).toInt()
+        listener?.onCellTouched(posSelectRow, posSelectColumn)
     }
 
     fun registerListener(listener: BoardView.OnTouchListener) {

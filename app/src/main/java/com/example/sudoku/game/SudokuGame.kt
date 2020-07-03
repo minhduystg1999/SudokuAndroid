@@ -17,6 +17,9 @@ class SudokuGame {
     var selectCellLiveData = MutableLiveData<Pair<Int, Int>>()
     var cellsLiveData = MutableLiveData<List<Cell>>()
 
+    //Dung de tra ve gia tri live da hoan thanh game hay chua
+    var isFinishedLiveData = MutableLiveData<Boolean>()
+
     //Dung de nhan live data trong trang thai notes
     var isNotesLiveData = MutableLiveData<Boolean>()
     var highlightKeysLiveData = MutableLiveData<Set<Int>>()
@@ -33,6 +36,7 @@ class SudokuGame {
         selectCellLiveData.postValue(Pair(selectRow, selectColumn))
         cellsLiveData.postValue(board.cells)
         isNotesLiveData.postValue(isNotes)
+        isFinishedLiveData.postValue(isFinished())
     }
 
     //Function xu li input cho cells
@@ -53,6 +57,7 @@ class SudokuGame {
             cell.value = number
         }
         cellsLiveData.postValue(board.cells)
+        isFinishedLiveData.postValue(isFinished())
     }
 
     //Update select cell
@@ -86,8 +91,10 @@ class SudokuGame {
         if (isNotes) {
             cell.notes.clear()
             highlightKeysLiveData.postValue(setOf())
-        } else
+        } else {
             cell.value = 0
+            cell.isRightValue = false
+        }
         cellsLiveData.postValue(board.cells)
     }
 
@@ -100,6 +107,18 @@ class SudokuGame {
                 board.cells[i].notes.clear()
             }
         cellsLiveData.postValue(board.cells)
+    }
+
+    //Function new game
+    fun newGame() {
+        board.cells = createSolution()
+        selectRow = -1
+        selectColumn = -1
+        isNotes = false
+        selectCellLiveData.postValue(Pair(selectRow, selectColumn))
+        cellsLiveData.postValue(board.cells)
+        isNotesLiveData.postValue(isNotes)
+        isFinishedLiveData.postValue(isFinished())
     }
 
     //--------------------------------------------------------------------------------------------------------
@@ -174,11 +193,13 @@ class SudokuGame {
         return true
     }
 
-    //Function to check if the sudoku is solved
-    fun isSolved(): Boolean {
-        for (i in 0 until boardSize * boardSize)
-            if (!board.cells[i].isRightValue)
-                return false
+    //Function to check if the game is finished or not
+    fun isFinished(): Boolean {
+        board.cells.forEach {
+            if (!it.isStartingCell)
+                if (!it.isRightValue)
+                    return false
+        }
         return true
     }
 }
