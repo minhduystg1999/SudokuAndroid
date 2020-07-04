@@ -1,6 +1,7 @@
 package com.example.sudoku.view
 
 import android.app.AlertDialog
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.PorterDuff
 import androidx.appcompat.app.AppCompatActivity
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
 
         exitButton.setOnClickListener { showExitDialog(viewModel) }
 
-        newButton.setOnClickListener { viewModel.sudokuGame.newGame() }
+        newButton.setOnClickListener { showNewGameDialog(viewModel) }
 
         hintButton.setOnClickListener { viewModel.sudokuGame.hint() }
 
@@ -82,11 +83,16 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
 
     //Function show dialog khi finish game
     private fun showCongratsDialog(viewModel: SudokuViewModel) {
-        val dialog = AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this, AlertDialog.THEME_HOLO_LIGHT)
+        dialog.setIcon(R.drawable.finish_icon)
         dialog.setTitle("Congratulations!")
         dialog.setMessage("You have finished the sudoku. Cheers for the hard work!")
         dialog.setPositiveButton("New game") {
-            dialog, which -> viewModel.sudokuGame.newGame()
+            dialog, which ->
+            run {
+                dialog.cancel()
+                showNewGameDialog(viewModel)
+            }
         }
         dialog.setNegativeButton("Exit") {
             dialog, which ->
@@ -95,23 +101,46 @@ class MainActivity : AppCompatActivity(), BoardView.OnTouchListener {
                 exitProcess(0)
             }
         }
+
         dialog.show()
     }
 
     private fun showExitDialog(viewModel: SudokuViewModel) {
-        val dialog = AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
+        dialog.setIcon(R.drawable.exit_game_icon)
         dialog.setTitle("Exit!")
         dialog.setMessage("Exit the game?")
-        dialog.setPositiveButton("No") {
+        dialog.setNegativeButton("No") {
                 dialog, which -> dialog.dismiss()
         }
-        dialog.setNegativeButton("Yes") {
+        dialog.setPositiveButton("Yes") {
                 dialog, which ->
             run {
                 finish()
                 exitProcess(0)
             }
         }
+        dialog.show()
+    }
+
+    private fun showNewGameDialog(viewModel: SudokuViewModel) {
+        val diffNumber: Array<Int> = arrayOf(25, 35, 45)
+        val diffName: Array<String> = arrayOf("Easy", "Normal", "Hard")
+        var diffChoice: Int = 0
+
+        val dialog = AlertDialog.Builder(this, AlertDialog.THEME_HOLO_LIGHT)
+        dialog.setIcon(R.drawable.new_game_icon)
+        dialog.setTitle("Choose your game difficulty:")
+        dialog.setSingleChoiceItems(diffName, 0) {
+            dialog, i -> diffChoice = diffNumber[i]
+        }
+        dialog.setPositiveButton("OK") {
+            dialog, which -> viewModel.sudokuGame.newGame(diffChoice)
+        }
+        dialog.setNegativeButton("Cancel") {
+            dialog, which ->  dialog.cancel()
+        }
+
         dialog.show()
     }
 }

@@ -11,11 +11,9 @@ class SudokuGame {
     private val blockSize = 3       //Block size = size of a block 3x3 = 3 cells on each direction
     private val boardSize = 9       //Board size = size of each direction = 9 cells
 
-    private val board: Board
+    private var board: Board
 
-    private var solution = List(boardSize * boardSize) {
-        i -> Cell(i / 9,i % 9,0, true)
-    }
+    private var solution: List<Cell>
 
     //Dung de nhan select cell data live tu game
     var selectCellLiveData = MutableLiveData<Pair<Int, Int>>()
@@ -31,9 +29,7 @@ class SudokuGame {
     init{
         solution = generateSolution()
 
-        var cells = removeCell(solution)
-
-        board = Board(boardSize, cells)
+        board = Board(boardSize, removeCell(solution, 25))
 
         selectCellLiveData.postValue(Pair(selectRow, selectColumn))
         cellsLiveData.postValue(board.cells)
@@ -72,7 +68,6 @@ class SudokuGame {
         val cell = board.getCell(selectRow, selectColumn)
         cell.value = 0
         cell.isRightValue = false
-        cellsLiveData.postValue(board.cells)
 
         cellsLiveData.postValue(board.cells)
         isFinishedLiveData.postValue(isFinished())
@@ -101,19 +96,17 @@ class SudokuGame {
     }
 
     //Function new game
-    fun newGame() {
+    fun newGame(diff: Int) {
         solution = generateSolution()
 
-        var cells = removeCell(solution)
-
-        board.cells = cells
+        board.cells = removeCell(solution, diff)
 
         selectRow = -1
         selectColumn = -1
 
         selectCellLiveData.postValue(Pair(selectRow, selectColumn))
         cellsLiveData.postValue(board.cells)
-        isFinishedLiveData.postValue(isFinished())
+        isFinishedLiveData.postValue(false)
     }
 
     //--------------------------------------------------------------------------------------------------------
@@ -130,7 +123,7 @@ class SudokuGame {
     }
 
     //Function to get possible number for selected cell
-    private fun getPossibleNumber(cells: List<Cell>, row: Int, col: Int): Set<Int> {
+    private fun getPossibleNumber(cells: List<Cell>, row: Int, col: Int): Iterable<Int> {
         var numbers = mutableSetOf<Int>()
         numbers.addAll(1..9)
 
@@ -156,7 +149,7 @@ class SudokuGame {
                         numbers.remove(cells[r * boardSize + c].value)
         }
 
-        return numbers
+        return numbers.asIterable()
     }
 
     //Function solve tra ve gia tri true neu solution da generate solve dc
@@ -260,16 +253,12 @@ class SudokuGame {
     }
 
     //Function remove number trong cell de tao duoc game hoan chinh
-    private fun removeCell(cells: List<Cell>): List<Cell> {
+    private fun removeCell(cells: List<Cell>, diff: Int): List<Cell> {
         val removed = List(boardSize * boardSize) {
-            i -> Cell( i / 9,  i % 9, 0, true)
+            i -> Cell( i / 9,  i % 9, cells[(i / 9) * boardSize + (i % 9) ].value, true)
         }
 
-        removed.forEach {
-            it.value = cells[it.row * boardSize + it.col].value
-        }
-
-        var numberOfRemoveCell = 24
+        var numberOfRemoveCell = diff
 
         while (numberOfRemoveCell > 0) {
             val randomRow = Random.nextInt(0, 9)

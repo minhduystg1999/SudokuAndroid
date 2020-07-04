@@ -54,6 +54,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         style = Paint.Style.FILL_AND_STROKE
         color = Color.BLACK
         textSize = 24F
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC)
     }
 
     //Cell paint for starting cells
