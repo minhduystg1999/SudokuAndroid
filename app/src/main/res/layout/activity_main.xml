@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,9 +11,9 @@
         android:id="@+id/menuButtonLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:columnCount="3"
+        android:columnCount="2"
         android:rowCount="1"
-        android:layout_above="@id/timer"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp">
 
@@ -26,50 +27,24 @@
             android:background="@android:color/transparent"
             android:drawableTop="@drawable/new_game_icon" />
 
-        <ToggleButton
-            android:id="@+id/musicButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_row="0"
-            android:layout_column="1"
-            android:textOn="UNMUTE"
-            android:textOff="MUTE"
-            android:background="@android:color/transparent"
-            android:drawableTop="@drawable/music_icon">
-        </ToggleButton>
-
         <Button
             android:id="@+id/exitButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_row="0"
-            android:layout_column="2"
+            android:layout_column="1"
             android:text="EXIT"
             android:background="@android:color/transparent"
             android:drawableTop="@drawable/exit_game_icon" />
 
     </GridLayout>
 
-    <Chronometer
-        android:id="@+id/timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawablePadding="5dp"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="20dp"
-        android:layout_above="@id/boardView"
-        android:layout_marginBottom="10dp"
-        android:layout_centerHorizontal="true"
-        android:drawableStart="@drawable/timer_icon"
-        android:drawableLeft="@drawable/timer_icon"/>
-
     <com.example.sudoku.view.custom.BoardView
         android:id="@+id/boardView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_above="@id/buttonLayout"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="10dp" />
 
     <GridLayout
         android:id="@+id/buttonLayout"
@@ -86,8 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_row="0"
             android:layout_column="0"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_purple"
+            android:textColor="@android:color/holo_green_dark"
             android:text="1" />
 
         <Button
@@ -96,8 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_row="0"
             android:layout_column="1"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_purple"
+            android:textColor="@android:color/holo_green_dark"
             android:text="2" />
 
         <Button
@@ -106,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_row="0"
             android:layout_column="2"
-            android:textColor="@android:color/holo_purple"
+            android:textColor="@android:color/holo_green_dark"
             android:text="3" />
 
         <Button
@@ -115,8 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_row="1"
             android:layout_column="0"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_purple"
+            android:textColor="@android:color/holo_green_dark"
             android:text="4" />
 
         <Button
@@ -125,8 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_row="1"
             android:layout_column="1"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_purple"
+            android:textColor="@android:color/holo_green_dark"
             android:text="5" />
 
         <Button
@@ -135,8 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_row="1"
             android:layout_column="2"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_purple"
+            android:textColor="@android:color/holo_green_dark"
             android:text="6" />
 
         <Button
@@ -145,8 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_row="2"
             android:layout_column="0"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_purple"
+            android:textColor="@android:color/holo_green_dark"
             android:text="7" />
 
         <Button
@@ -155,8 +124,7 @@
             android:layout_height="wrap_content"
             android:layout_row="2"
             android:layout_column="1"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_purple"
+            android:textColor="@android:color/holo_green_dark"
             android:text="8" />
 
         <Button
@@ -165,8 +133,7 @@
             android:layout_height="wrap_content"
             android:layout_row="2"
             android:layout_column="2"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_purple"
+            android:textColor="@android:color/holo_green_dark"
             android:text="9" />
 
     </GridLayout>

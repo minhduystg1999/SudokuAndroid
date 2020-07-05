@@ -29,7 +29,7 @@ class SudokuGame {
     init{
         solution = generateSolution()
 
-        board = Board(boardSize, removeCell(solution, 32))
+        board = Board(boardSize, removeCell(solution, 25))
 
         selectCellLiveData.postValue(Pair(selectRow, selectColumn))
         cellsLiveData.postValue(board.cells)
@@ -113,7 +113,7 @@ class SudokuGame {
     // GAME LOGIC REGION
     //Function generate solution
     private fun generateSolution(): List<Cell> {
-        val newSolution = List(boardSize * boardSize) {
+        var newSolution = List(boardSize * boardSize) {
             i  -> Cell( i / 9, i % 9, 0, true)
         }
 
@@ -124,7 +124,7 @@ class SudokuGame {
 
     //Function to get possible number for selected cell
     private fun getPossibleNumber(cells: List<Cell>, row: Int, col: Int): Iterable<Int> {
-        val numbers = mutableSetOf<Int>()
+        var numbers = mutableSetOf<Int>()
         numbers.addAll(1..9)
 
         //Loai cac so da co trong row ra khoi list numbers

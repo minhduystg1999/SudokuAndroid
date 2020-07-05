@@ -21,7 +21,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
 
     private var cells: List<Cell>? = null   //List cell
 
-    private var listener: OnTouchListener? = null     //listener of touch event
+    private var listener: BoardView.OnTouchListener? = null     //listener of touch event
 
     //Thick line for drawing lines
     private val thickLine = Paint().apply{
@@ -82,7 +82,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     //Override function onMeasure de nhan gia tri kich thuoc cell
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val sizePixels = widthMeasureSpec.coerceAtMost(heightMeasureSpec)
+        val sizePixels = Math.min(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(sizePixels, sizePixels)
     }
 
@@ -146,6 +146,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
     private fun writeValue(canvas: Canvas) {
         cells?.forEach { cell ->
             //Chuyen value sang string va tao bounds cho text cell
+            val value = cell.value
             val textBounds = Rect()
 
             if (cell.value !=0) {
@@ -194,7 +195,7 @@ class BoardView(context: Context, attributeSet: AttributeSet) : View(context, at
         listener?.onCellTouched(posSelectRow, posSelectColumn)
     }
 
-    fun registerListener(listener: OnTouchListener) {
+    fun registerListener(listener: BoardView.OnTouchListener) {
         this.listener = listener
     }
 
