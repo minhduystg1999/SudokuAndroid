@@ -3,7 +3,7 @@
 # Faculty of Software Engineering
 ## Sudoku Game - Android Application
 
-A simple Sudoku game written in Kotlin, there is only one level Medium.
+A simple Sudoku game written in Kotlin, there are three levels, easy, medium, hard.
 
 ### Demo
 
